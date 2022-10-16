@@ -7,15 +7,15 @@ const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simpl
 
 app.use(express.json());
 
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
     res.status(200).json({
         status: 'success',
         totalResults: tours.length,
         data: { tours }
     });
-})
+}
 
-app.post('/api/v1/tours', (req, res) => {
+const addNewTour = (req, res) => {
     const newId = (tours.length - 1) + 1;
     const newObject = Object.assign({ id: newId }, req.body);
     tours.push(newObject);
@@ -25,20 +25,20 @@ app.post('/api/v1/tours', (req, res) => {
             data: newObject
         })
     });
-})
+}
 
-app.get('/api/v1/tours/:id', (req, res) => {
+const getSpecificTour = (req, res) => {
     const id = req.params.id * 1;
     const tour = tours.find(el => el.id === id);
     res.status(200).json({
-        response : 'success',
-        data : tour,
+        response: 'success',
+        data: tour,
     });
-})
+}
 
-app.patch('/api/v1/tours/:id', (req, res) => {
-    
-});
+app.route('/api/v1/tours/').get(getAllTours).post(addNewTour)
+app.route('/api/v1/tours/:id').get(getSpecificTour)
+
 
 app.listen(PORT, () => {
     console.log('listening on port ' + PORT);
