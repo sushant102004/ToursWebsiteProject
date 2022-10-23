@@ -28,7 +28,14 @@ const tourSchema = new mongoose.Schema({
 
 const tourModel = new mongoose.model('Tour', tourSchema);
 
+const newTour = new tourModel({
+    name : 'My Tour',
+    price: 344,
+    rating: 4
+}
+);
 
+newTour.save().then(() => console.log(newTour));
 
 app.listen(PORT, () => {
     console.log('Listening on post: ' + process.env.PORT);
