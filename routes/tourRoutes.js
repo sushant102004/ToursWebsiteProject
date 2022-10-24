@@ -5,6 +5,6 @@ const tourController = require('../controllers/tourController')
 
 
 router.route('/').get(tourController.getAllTours).post(tourController.addNewTour)
-router.route('/:id').get(tourController.getTour)
+router.route('/:id').get(tourController.getTour).patch(tourController.updateTour)
 
 module.exports = router;
