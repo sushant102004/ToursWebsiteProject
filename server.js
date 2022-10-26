@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
+const fs = require('fs');
+const Tour = require('./models/tourModels');
+
 const PORT = process.env.PORT || 8000;
 
 const DB = process.env.DB
