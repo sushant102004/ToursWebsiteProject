@@ -3,7 +3,17 @@ const Tour = require('./../models/tourModels')
 
 exports.getAllTours = async (req, res) => {
     try {
-        const tours = await Tour.find();
+        // Making a hard code copy of query
+        const queryString = { ...req.query };
+        const excludeFields = ['page', 'sort', 'limit', 'fields'];
+
+        // Using forEach to delete selected fields from query
+        excludeFields.forEach(el => delete queryString[el])
+
+        // Saving the complete query so we can implement other functions later.
+        const query = Tour.find(queryString);        
+
+        const tours = await query;
         res.status(200).json({
             status: 'success',
             data: {
@@ -18,7 +28,7 @@ exports.getAllTours = async (req, res) => {
     }
 }
 
-exports.addNewTour = async (req, res) =>  {
+exports.addNewTour = async (req, res) => {
     try {
         const newTour = await Tour.create(req.body);
         res.status(200).json({
@@ -32,7 +42,7 @@ exports.addNewTour = async (req, res) =>  {
             status: 'error',
             message: err
         })
-    }    
+    }
 }
 
 exports.getTour = async (req, res) => {
