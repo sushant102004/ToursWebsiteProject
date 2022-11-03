@@ -16,7 +16,8 @@ exports.getAllTours = async (req, res) => {
         queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
         // Saving the complete query so we can implement other functions later.
-        let query = Tour.find(JSON.parse(queryString));    
+        let query = Tour.find(JSON.parse(queryString));   
+        
         
         // Sorting
         if(req.query.sort){
