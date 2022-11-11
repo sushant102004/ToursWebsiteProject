@@ -46,6 +46,17 @@ class APIFeatures {
 
         return this
     }
+
+    pagination(){
+        const page = this.queryString.page * 1 || 1
+        const results = this.queryString.results * 1 || 100
+        const skip = (page - 1) * results
+
+        if(this.queryString.page){
+            this.query = this.query.skip(skip).limit(results)
+        }
+        return this
+    }
 }
 
 exports.getAllTours = async (req, res) => {
@@ -74,12 +85,21 @@ exports.getAllTours = async (req, res) => {
         //     const fields = req.query.fields.split(',').join(' ')
         //     query = query.select(fields)
         // } else query = query.select('-name')
+
+        // Pagination
+        // const page = req.query.page * 1 || 1
+        // const limit = req.query.limit * 1 || 100
+        // const skip = (page - 1) * limit
+
+        // if(req.query.page){
+        //     query = query.skip(skip).limit(limit)
+        // }
         
 
 
         // const tours = await query;
 
-        const features = new APIFeatures(Tour.find(), req.query).filter().sort().limit()
+        const features = new APIFeatures(Tour.find(), req.query).filter().sort().limit().pagination()
         const tours = await features.query
 
         res.status(200).json({
