@@ -57,58 +57,19 @@ class APIFeatures {
 
 exports.getAllTours = async (req, res) => {
     try {
-        // Making a hard code copy of query
-        // const queryObj = { ...req.query };
-        // const excludeFields = ['page', 'sort', 'limit', 'fields'];
-        
-        // // Using forEach to delete selected fields from query
-        // excludeFields.forEach(el => delete queryObj[el])
-        
-        // // Advance Filtering
-        // // {difficulty: 'easy', duration: {$gte: 5}}
-        // // gte, gt, lte, lt
-        // let queryString = JSON.stringify(queryObj);
-        // queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+        const queryObj = { ...req.query };
+        const excludeFields = ['page', 'sort', 'limit', 'fields'];
+
+        excludeFields.forEach(el => delete queryObj[el])
+
+        // Filtering
+        const queryStr = JSON.stringify(queryObj)
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
+
+        const query = Tour.find(queryStr)
 
 
-        // // Saving the complete query so we can implement other functions later.
-        // let query = Tour.find(JSON.parse(queryString));   
-                
-        
-        // Sorting
-        // if(req.query.sort){
-        //     const sortBy = req.query.sort.split(',').join(' ')
-        //     query = query.sort(sortBy)
-        // } else {
-        //     query = query.sort('-createdAt')
-        // }
-
-        // Field Limiting -> Showing only some useful information
-        /*
-            query.select('name rating difficulty')
-        */
-    //    if(req.query.fields){
-    //     const fields = req.query.fields.split(',').join(' ')
-    //     query = query.select(fields)
-    //    } else query = query.select('-__v')
-
-        //Pagination
-        /*
-            Let page = 3 & limit = 10
-            so page 1 will have 1 - 10 results and page 2 will have 11 - 20
-            page 3 will have 21 to 30 results
-        */
-
-        // const page = req.query.page * 1 || 1;
-        // const limit = req.query.limit * 1 || 100;
-        // const skip = (page - 1) * limit;
-
-        // query = query.skip(skip).limit(limit)
-
-        
-        const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().pagination()
-
-        const tours = await features.query;
+        const tours = await query;
         res.status(200).json({
             status: 'success',
             data: {
