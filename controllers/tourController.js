@@ -188,10 +188,12 @@ exports.getToursStats = async (req, res) => {
     try {
         const stats = await Tour.aggregate([
             {
+                // Find documents with ratingAverage greater then or equal to 4
                 $match : { ratingAverage : { $gte : 4 }}
             },
             {
                 $group : {
+                    // Grouping documents with difficultu so that we can have results for different difficulty
                     _id : '$difficulty',
                     numTours : { $sum : 1 },
                     numRating : { $sum : '$ratingQuantity' },
@@ -202,6 +204,7 @@ exports.getToursStats = async (req, res) => {
                 }
             },
             {
+                // 1 -> Ascending & -1 Descending
                 $sort : { avgPrice : 1}
             }
         ])
