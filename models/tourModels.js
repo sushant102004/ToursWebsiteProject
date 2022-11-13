@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -21,6 +22,7 @@ const tourSchema = new mongoose.Schema({
         required: [true, 'Tour difficulty is required'],
         trim: true
     },
+    slug : String,
     ratingAverage: {
         type: Number,
         default: 4.5
@@ -61,6 +63,12 @@ const tourSchema = new mongoose.Schema({
 // Using normal function because this keyword can't be accssed from arrow function
 tourSchema.virtual('durationWeeks').get(function() {
     return this.duration / 7
+})
+
+// Document Middleware
+tourSchema.pre('save').get(function(next) {
+    this.slug = slugify(this.name, { lower : true })
+    next()
 })
 
 const Tour = new mongoose.model('Tour', tourSchema);
