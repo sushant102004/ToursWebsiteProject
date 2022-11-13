@@ -67,6 +67,7 @@ tourSchema.virtual('durationWeeks').get(function() {
 
 // Document Middleware
 tourSchema.pre('save').get(function(next) {
+    // this keyword points to current object
     this.slug = slugify(this.name, { lower : true })
     next()
 })
