@@ -222,6 +222,13 @@ exports.getToursStats = async (req, res) => {
 }
 
 exports.getMonthlyPlan = async (req, res) => {
+    // Task -> Get detials of months. Like how many tours are in a evey month. 
+    /*
+        steps: 
+        1. Unwing startDates to make copies of tour.
+        2. Match tours with given year.
+        3. Group them with id 'month'
+    */
     try {
         const year = req.params.year * 1;
         const plan = await Tour.aggregate([
@@ -243,6 +250,17 @@ exports.getMonthlyPlan = async (req, res) => {
                     tours : { $push : '$name' }
                 }
             },
+            // Adding custom fields in api
+            {
+                $addFields : { month : '$_id' }
+            },
+            // Hiding '_id' field
+            {
+                $project : {_id : 0}
+            },
+            {
+                $sort : { numOfTours : -1}
+            }
         ])
         res.status(200).json({
             stats : 'success',
