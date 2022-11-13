@@ -53,6 +53,14 @@ const tourSchema = new mongoose.Schema({
         default: Date.now()
     },
     startDates: [Date]
+}, {
+    toJSON: { virtuals: true },
+    toObject : { virtuals: true }
+})
+
+// Using normal function because this keyword can't be accssed from arrow function
+tourSchema.virtual('durationWeeks').get(function() {
+    return this.duration / 7
 })
 
 const Tour = new mongoose.model('Tour', tourSchema);
