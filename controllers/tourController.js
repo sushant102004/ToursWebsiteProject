@@ -254,12 +254,12 @@ exports.getMonthlyPlan = async (req, res) => {
             {
                 $addFields : { month : '$_id' }
             },
-            // Hiding '_id' field
+            // Hidi ng '_id' field
             {
-                $project : {_id : 0}
+                $project : { _id : 0 }
             },
             {
-                $sort : { numOfTours : -1}
+                $sort : { numOfTours : -1 }
             }
         ])
         res.status(200).json({
