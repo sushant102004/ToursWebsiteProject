@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const AppError = require('./utils/appError')
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -20,11 +21,11 @@ app.all('*', (req, res, next) => {
     //     message: `The route ${req.originalUrl} not found.`
     // })
 
-    const err = new Error(`The route ${req.originalUrl} was not found`)
-    err.statusCode = 404
-    err.status = 'not found'
+    // const err = new Error(`The route ${req.originalUrl} was not found`)
+    // err.statusCode = 404
+    // err.status = 'not found'
 
-    next(err)
+    next(new AppError(`The route ${req.originalUrl} was not found`, 404))
 })
 
 // Global Error Handler

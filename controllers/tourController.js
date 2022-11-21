@@ -1,5 +1,5 @@
 const Tour = require('./../models/tourModels')
-const APIFeatures = require('./../features/apifeatures')
+const APIFeatures = require('../utils/apifeatures')
 
 exports.getTopFiveTours = async (req, res, next) => {
     req.query.limit = '5'
