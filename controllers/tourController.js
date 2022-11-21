@@ -1,4 +1,5 @@
 const Tour = require('./../models/tourModels')
+const APIFeatures = require('./../features/apifeatures')
 
 exports.getTopFiveTours = async (req, res, next) => {
     req.query.limit = '5'
@@ -8,56 +9,7 @@ exports.getTopFiveTours = async (req, res, next) => {
     next();
 }
 
-class APIFeatures {
-    constructor(query, queryString){
-        this.query = query;
-        this.queryString = queryString;
-    }
 
-    filter(){
-        let queryObj = { ...this.queryString };
-        const excludeFields = ['page', 'sort', 'limit', 'fields'];
-
-        excludeFields.forEach(el => delete queryObj[el])
-
-        // Filtering
-        let queryStr = JSON.stringify(queryObj)
-        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
-
-
-        this.query.find(JSON.parse(queryStr))
-        return this
-    }
-
-    sort(){
-        if(this.queryString.sort){
-            const sortBy = this.queryString.sort.split(',').join(' ')
-            this.query = this.query.sort(sortBy)
-        } else this.query = this.query.sort('-createdAt')
-        
-        return this
-    }
-
-    limit(){
-        if(this.queryString.fields){
-            const fields = this.queryString.fields.split(',').join(' ')
-            this.query = this.query.select(fields)
-        } else this.query = this.query.select('-__v')
-
-        return this
-    }
-
-    pagination(){
-        const page = this.queryString.page * 1 || 1
-        const results = this.queryString.results * 1 || 100
-        const skip = (page - 1) * results
-
-        if(this.queryString.page){
-            this.query = this.query.skip(skip).limit(results)
-        }
-        return this
-    }
-}
 
 exports.getAllTours = async (req, res) => {
     try {
@@ -74,7 +26,7 @@ exports.getAllTours = async (req, res) => {
         // let query = Tour.find(JSON.parse(queryStr))
 
         // Sorting
-        
+
         // if(this.queryString){
         //     const sortBy = req.query.sort.split(',').join(' ')
         //     query = this.query.sort(sortBy)
@@ -94,7 +46,7 @@ exports.getAllTours = async (req, res) => {
         // if(req.query.page){
         //     query = query.skip(skip).limit(limit)
         // }
-        
+
 
 
         // const tours = await query;
@@ -189,29 +141,29 @@ exports.getToursStats = async (req, res) => {
         const stats = await Tour.aggregate([
             {
                 // Find documents with ratingAverage greater then or equal to 4
-                $match : { ratingAverage : { $gte : 4 }}
+                $match: { ratingAverage: { $gte: 4 } }
             },
             {
-                $group : {
+                $group: {
                     // Grouping documents with difficultu so that we can have results for different difficulty
-                    _id : '$difficulty',
-                    numTours : { $sum : 1 },
-                    numRating : { $sum : '$ratingQuantity' },
-                    avgRating : { $avg : '$ratingAverage' },
-                    avgPrice : { $avg : '$price' },
-                    maxPrice : { $max : '$price' },
-                    minPrice : { $min : '$price' },
+                    _id: '$difficulty',
+                    numTours: { $sum: 1 },
+                    numRating: { $sum: '$ratingQuantity' },
+                    avgRating: { $avg: '$ratingAverage' },
+                    avgPrice: { $avg: '$price' },
+                    maxPrice: { $max: '$price' },
+                    minPrice: { $min: '$price' },
                 }
             },
             {
                 // 1 -> Ascending & -1 Descending
-                $sort : { avgPrice : 1}
+                $sort: { avgPrice: 1 }
             }
         ])
 
         res.status(200).json({
-            status : 'success',
-            data : stats
+            status: 'success',
+            data: stats
         })
     } catch (err) {
         res.status(404).json({
@@ -233,38 +185,38 @@ exports.getMonthlyPlan = async (req, res) => {
         const year = req.params.year * 1;
         const plan = await Tour.aggregate([
             {
-                $unwind : '$startDates'
+                $unwind: '$startDates'
             },
             {
-                $match : {
-                    startDates : {
-                        $gte : new Date(`${year}-01-01`),
-                        $lte : new Date(`${year}-12-31`),
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`),
                     }
                 }
             },
             {
-                $group : {
-                    _id : { $month : '$startDates' },
-                    numOfTours : { $sum : 1 },
-                    tours : { $push : '$name' }
+                $group: {
+                    _id: { $month: '$startDates' },
+                    numOfTours: { $sum: 1 },
+                    tours: { $push: '$name' }
                 }
             },
             // Adding custom fields in api
             {
-                $addFields : { month : '$_id' }
+                $addFields: { month: '$_id' }
             },
             // Hidi ng '_id' field
             {
-                $project : { _id : 0 }
+                $project: { _id: 0 }
             },
             {
-                $sort : { numOfTours : -1 }
+                $sort: { numOfTours: -1 }
             }
         ])
         res.status(200).json({
-            stats : 'success',
-            data : plan
+            stats: 'success',
+            data: plan
         })
     } catch (err) {
         res.status(404).json({
