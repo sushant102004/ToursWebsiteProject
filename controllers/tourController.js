@@ -102,6 +102,7 @@ exports.getTour = async (req, res, next) => {
             status: 'fail',
             message: err
         })
+        // return next(new AppError('User Was Not Created', 404))
     }
 }
 
