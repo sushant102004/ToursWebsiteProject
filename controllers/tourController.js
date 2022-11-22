@@ -1,5 +1,6 @@
 const Tour = require('./../models/tourModels')
 const APIFeatures = require('../utils/apifeatures')
+const AppError = require('../utils/appError')
 
 exports.getTopFiveTours = async (req, res, next) => {
     req.query.limit = '5'
@@ -86,9 +87,9 @@ exports.addNewTour = async (req, res) => {
     }
 }
 
-exports.getTour = async (req, res) => {
+exports.getTour = async (req, res, next) => {
     try {
-        const tour = await Tour.findById(req.params.id);
+        const tour = await Tour.findById(req.params.id)
         res.status(200).json({
             status: 'success',
             data: {
