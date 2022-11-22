@@ -89,7 +89,11 @@ exports.addNewTour = async (req, res) => {
 
 exports.getTour = async (req, res, next) => {
     try {
-        const tour = await Tour.findById(req.params.id)
+        const tour = await Tour.findById('6358b35e562436fa6455b93')
+        
+        if(!tour){
+            return next(new AppError(`Can't find tour with id ${req.params.id}`), 404)
+        }
         res.status(200).json({
             status: 'success',
             data: {
