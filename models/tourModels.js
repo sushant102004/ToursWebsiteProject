@@ -24,7 +24,7 @@ const tourSchema = new mongoose.Schema({
         required: [true, 'Tour difficulty is required'],
         trim: true,
         enum : {
-            values : ['easy', 'medium', 'hard'],
+            values : ['easy', 'medium', 'difficult'],
             message : 'Difficulty is either easy, medium or difficult'
         }
     },
@@ -74,7 +74,7 @@ tourSchema.virtual('durationWeeks').get(function() {
 })
 
 // Document Middleware
-tourSchema.pre('save', function() {
+tourSchema.pre('save', function(next) {
     this.slug = slugify(`${this.name}`, { lower : true })
     next()
 })
