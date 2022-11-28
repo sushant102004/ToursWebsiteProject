@@ -1,5 +1,6 @@
 const User = require('./../models/userModel')
 const jwt = require('jsonwebtoken');
+const AppError = require('./../utils/appError')
 
 exports.signup = async (req, res, next) => {
     try {
@@ -9,6 +10,7 @@ exports.signup = async (req, res, next) => {
             password: req.body.password,
             passwordConfirm: req.body.passwordConfirm        
         })
+
 
         const token = jwt.sign(
             { id: newUser._id },
@@ -31,3 +33,32 @@ exports.signup = async (req, res, next) => {
     }
 }
 
+exports.login = async (req, res, next) => {
+    // In ES6 if variable name == property name then we can just write {variable}
+    const { email, password } = req.body
+
+    // 1. Check if email and password exists
+    if(!email || !password) {
+        return next(new AppError('Please provide a valid email and password'), 400)
+    }
+    let user = null
+
+    try {
+        user = await User.findOne({ email }).select('+password')
+        
+        if(!user || !await user.checkPassword(password, user.password)) {
+            return next(new AppError('Entered email or password is incorrect.', 401))
+        }
+
+    } catch (err) {
+        console.log(err)
+    }
+
+    const token = jwt.sign({ id: user._id}, process.env.JWTSecret, {expiresIn: process.env.JWTExpire})
+
+    res.status(200).json({
+        status:'success',
+        token,
+        data : user
+    })
+}
