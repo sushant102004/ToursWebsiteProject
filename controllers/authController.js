@@ -61,3 +61,15 @@ exports.login = async (req, res, next) => {
         token,
     })
 }
+
+exports.protectRoute = async (req, res, next) => {
+    let token;
+
+    try {
+        token = req.headers.authorization
+        if(!token) return next(new AppError('Authorization token is required.', 401))
+        else next()
+    } catch (err) {
+        return next(err);
+    }
+}
