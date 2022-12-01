@@ -49,7 +49,6 @@ exports.login = async (req, res, next) => {
         if(!user || !await user.checkPassword(password, user.password)) {
             return next(new AppError('Entered email or password is incorrect.', 401))
         }
-
     } catch (err) {
         console.log(err)
     }
@@ -63,13 +62,28 @@ exports.login = async (req, res, next) => {
 }
 
 exports.protectRoute = async (req, res, next) => {
-    let token;
-
     try {
-        token = req.headers.authorization
-        if(!token) return next(new AppError('Authorization token is required.', 401))
-        else next()
+        let token;
+        let decoded;
+
+        if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+            token = await req.headers.authorization.split(' ')[1]
+        }
+        if(token === undefined){
+            return next(new AppError('Authorization token is required', 401))
+        } 
+        
+        try {
+            decoded = jwt.verify(token, process.env.JWTSecret)
+        } catch(err) {
+            return next(err)
+        }
+        
+        const freshUser = await User.findById(decoded.id)
+        if(!freshUser) return next(new AppError('User has been deleted', 401))
+
+        next()
     } catch (err) {
-        return next(err);
+        return next(err)
     }
 }
