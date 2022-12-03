@@ -8,9 +8,9 @@ exports.signup = async (req, res, next) => {
             name: req.body.name,
             email: req.body.email,
             password: req.body.password,
-            passwordConfirm: req.body.passwordConfirm        
+            passwordConfirm: req.body.passwordConfirm,
+            passwordChangedAt: req.body.passwordChangedAt        
         })
-
 
         const token = jwt.sign(
             { id: newUser._id },
@@ -66,6 +66,8 @@ exports.protectRoute = async (req, res, next) => {
         let token;
         let decoded;
 
+        // Check if auth token exixts
+
         if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
             token = await req.headers.authorization.split(' ')[1]
         }
@@ -73,12 +75,14 @@ exports.protectRoute = async (req, res, next) => {
             return next(new AppError('Authorization token is required', 401))
         } 
         
+        // Deocde auth token
         try {
             decoded = jwt.verify(token, process.env.JWTSecret)
         } catch(err) {
             return next(new AppError('Invalid token', 401))
         }
-        
+
+        // Check if user is not deleted
         const freshUser = await User.findById(decoded.id)
         if(!freshUser) return next(new AppError('User has been deleted', 401))
 
