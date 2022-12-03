@@ -47,6 +47,10 @@ userSchema.methods.checkPassword = async function(enteredPassword, userPassword)
     return await bcrypt.compare(enteredPassword, userPassword)
 }
 
+userSchema.methods.checkPasswordChange = async function(){
+    
+}
+
 const User = new mongoose.model('User', userSchema)
 
 module.exports = User;

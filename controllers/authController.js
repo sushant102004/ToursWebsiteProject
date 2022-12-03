@@ -76,7 +76,7 @@ exports.protectRoute = async (req, res, next) => {
         try {
             decoded = jwt.verify(token, process.env.JWTSecret)
         } catch(err) {
-            return next(err)
+            return next(new AppError('Invalid token', 401))
         }
         
         const freshUser = await User.findById(decoded.id)
