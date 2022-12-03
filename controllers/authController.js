@@ -9,7 +9,8 @@ exports.signup = async (req, res, next) => {
             email: req.body.email,
             password: req.body.password,
             passwordConfirm: req.body.passwordConfirm,
-            passwordChangedAt: req.body.passwordChangedAt        
+            passwordChangedAt: req.body.passwordChangedAt,
+            role: req.body.role        
         })
 
         const token = jwt.sign(
@@ -86,8 +87,18 @@ exports.protectRoute = async (req, res, next) => {
         const freshUser = await User.findById(decoded.id)
         if(!freshUser) return next(new AppError('User has been deleted', 401))
 
+        req.user = freshUser
         next()
     } catch (err) {
         return next(err)
+    }
+}
+
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        if(!roles.includes(req.user.role)){
+            return next(new AppError('This action is not allowed', 403))
+        }
+        next()
     }
 }
