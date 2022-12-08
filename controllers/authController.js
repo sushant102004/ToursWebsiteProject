@@ -135,9 +135,14 @@ exports.resetPassword = async (req, res, next) => {
 
     try {
         const user = await User.findOne({passwordResetToken : resetToken})
+        
+        if(!user) {
+            return next(new AppError('Token invalid', 404))
+        }
 
         user.password = newPassword
         user.passwordConfirm = newPasswordConfirm
+        user.passwordResetToken = undefined
         user.passwordChangedAt = Date.now()
         
         await user.save({validateBeforeSave : true})
