@@ -5,8 +5,16 @@ const errorHandler = require('./controllers/errorController');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const { default: rateLimit } = require('express-rate-limit');
 
 const app = express();
+
+app.use(rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: true
+}))
 
 app.use(express.json());
 app.use(morgan('dev'));
