@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator')
-const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -38,11 +39,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum : ['admin', 'lead-guide', 'guide', 'user'],
         default : 'user', 
-    }
+    },
+    passwordResetToken : String
 });
 
 userSchema.pre('save', async function(next){
-    // if(!this.isModified('password')) return next();
+    if(!this.isModified('password')) return next();
 
     this.password = await bcrypt.hash(this.password, 12)
     this.passwordConfirm = undefined;
@@ -64,6 +66,11 @@ userSchema.methods.checkPasswordChange = async function(JWTTimestamp){
         }
     }
     return false
+}
+
+userSchema.methods.createPasswordResetToken = async function() {
+    this.passwordResetToken = jwt.sign({_id: this._id}, process.env.JWT_Password_Rest, {expiresIn : '10m'})
+    return this.passwordResetToken
 }
 
 const User = new mongoose.model('User', userSchema)

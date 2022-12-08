@@ -102,3 +102,51 @@ exports.restrictTo = (...roles) => {
         next()
     }
 }
+
+exports.forgotPassword = async (req, res, next) => {
+    const user = await User.findOne({email: req.body.email})
+
+    if(!user){
+        return next(new AppError('User not found', 404))
+    }
+
+    try {
+        const resetToken = await user.createPasswordResetToken()
+        await user.save({validateBeforeSave: false})
+
+        // To Implement - Send Reset Token to mail
+
+        res.status(200).json({
+            resetToken : resetToken
+        })
+    } catch (err){
+        return next(err)
+    } 
+}
+
+exports.resetPassword = async (req, res, next) => {
+    const resetToken = req.body.resetToken
+    const newPassword = req.body.newPassword
+    const newPasswordConfirm = req.body.newPasswordConfirm
+
+    if(!resetToken || !newPassword) {
+        return next(new AppError('Either reset token or new password in not provided'))
+    }
+
+    try {
+        const user = await User.findOne({passwordResetToken : resetToken})
+
+        user.password = newPassword
+        user.passwordConfirm = newPasswordConfirm
+        user.passwordChangedAt = Date.now()
+        
+        await user.save({validateBeforeSave : true})
+
+        res.status(200).json({
+            status:'success',
+            message:'Password changed successfully'
+        })
+    } catch (err) {
+        return next(err)
+    }
+}
