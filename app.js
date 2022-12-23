@@ -3,6 +3,7 @@ const helmet = require('helmet')
 const morgan = require('morgan');
 const AppError = require('./utils/appError')
 const errorHandler = require('./controllers/errorController');
+const cors = require('cors')
 
 
 const tourRouter = require('./routes/tourRoutes');
@@ -10,7 +11,9 @@ const userRouter = require('./routes/userRoutes');
 const { default: rateLimit } = require('express-rate-limit');
 
 const app = express();
+
 app.use(helmet())
+app.use(cors())
 
 app.use(rateLimit({
     windowMs: 10 * 60 * 1000,

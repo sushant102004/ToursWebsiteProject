@@ -18,18 +18,8 @@ exports.getAllUsers = async (req, res, next) => {
     }
 }
 
-exports.addNewUser = (req, res) => {
-
-}
-
-exports.getUser = (req, res) => {
-
-}
-
-exports.deleteUser = (req, res) => {
-
-}
-
-exports.updateUser = (req, res) => {
-
+exports.updateUserItself = async (req, res, next) => {
+    if(req.body.password || req.body.passwordConfirm){
+        return next(new AppError('Password Change Not Allowed Here', 400))
+    }
 }
